@@ -43,22 +43,19 @@ struct BusinessListView: View {
                     }
                 }
                 .pickerStyle(SegmentedPickerStyle())
-                switch selection {
-                case .mapView:
-                    Text("Map")
-                case .listView:
+                if selection == .listView{
                     ScrollView{
-                        HStack{
-                            Text("Restaurants")
-                                .font(.system(.title, design: .rounded, weight: .semibold))
-                            Spacer()
-                            
-                        }
+                        Text("Restaurants")
+                            .font(.system(.title, design: .rounded, weight: .semibold))
+                            .hSpacing()
+                        
                         ForEach(businessVM.businessQuery, id: \.id) {business in
                             BusinessRowView(business: business)
                         }
                     }
                     .scrollIndicators(.hidden)
+                } else {
+                    MapView()
                 }
                
             }
