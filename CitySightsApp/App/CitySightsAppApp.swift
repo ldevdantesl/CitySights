@@ -16,6 +16,7 @@ struct CitySightsAppApp: App {
                 .environment(BusinessViewModel())
                 .fullScreenCover(isPresented: $onboarding){
                     OnBoardingView()
+                        .environment(BusinessViewModel())
                 }
         }
     }

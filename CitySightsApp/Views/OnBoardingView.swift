@@ -15,6 +15,7 @@ enum OnBoardingPages: Int, CaseIterable{
 struct OnBoardingView: View {
     @State private var selectedTab: OnBoardingPages = .firstPage
     @AppStorage("onboarding") var onboarding = true
+    @Environment(BusinessViewModel.self) var businessVM
     var body: some View {
         ZStack{
             selectedTab == .firstPage ?
@@ -65,6 +66,7 @@ struct OnBoardingView: View {
                         }
                     } else {
                         onboarding.toggle()
+                        businessVM.getUserLocation()
                     }
                 } label:{
                     Text("Continue")
@@ -80,4 +82,5 @@ struct OnBoardingView: View {
 
 #Preview {
     OnBoardingView()
+        .environment(BusinessViewModel())
 }

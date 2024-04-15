@@ -11,6 +11,7 @@ struct ContentView: View {
     @Environment(BusinessViewModel.self) var businessVM
     @State var showAlert: Bool = false
     @State var showBusinessView: Bool = false
+    @State var showUserLocationButton: Bool = true
     
     var body: some View {
         @Bindable var businessVM = businessVM
@@ -27,7 +28,7 @@ struct ContentView: View {
                 TextField("Which city are you looking for? ", text: $businessVM.location)
                     .padding()
                     .autocorrectionDisabled()
-                    .frame(width: UIScreen.main.bounds.width - 70, height: 50)
+                    .frame(width: showUserLocationButton ? screen.width - 120 : screen.width - 70, height: 50)
                     .background(.secondary.opacity(0.2), in:.rect(cornerRadius: 15))
                     .onSubmit(of:.text){
                         search()
@@ -35,6 +36,11 @@ struct ContentView: View {
                     .onChange(of: businessVM.location) {
                         withAnimation {
                             self.showBusinessView = false
+                            if businessVM.location.isEmpty{
+                                self.showUserLocationButton = true
+                            } else {
+                                self.showUserLocationButton = false
+                            }
                         }
                     }
                 
@@ -45,6 +51,15 @@ struct ContentView: View {
                     .onTapGesture {
                         search()
                     }
+                if showUserLocationButton{
+                    Image(systemName: "mappin.circle.fill")
+                        .resizable().scaledToFit()
+                        .frame(width: 40, height: 40)
+                        .foregroundStyle(.blue.opacity(0.8))
+                        .onTapGesture {
+                            search(with: true)
+                        }
+                }
             }
             .padding(.horizontal,20)
             .padding()
@@ -56,10 +71,14 @@ struct ContentView: View {
             Button(role:.cancel) {} label: {Text("OK")}
         }
     }
-    func search(){
+    func search(with userLocation: Bool = false){
         Task{
             do{
-                try await businessVM.makeTask()
+                if !userLocation{
+                    try await businessVM.getResultsForSearchLocation()
+                } else {
+                    try await businessVM.getResultsForUserLocation()
+                }
                 await MainActor.run {
                     withAnimation {
                         self.showBusinessView.toggle()

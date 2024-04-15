@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import CoreLocation
 
 enum DataManagerErrors:Error, CaseIterable{
     case badURL
@@ -27,7 +28,17 @@ enum DataManagerErrors:Error, CaseIterable{
 
 class DataManager{
     static let shared = DataManager()
-    func businessSearch(with location: String) async throws -> [Business]{
+    
+    func businessSearch(with location: String?, userLocation: CLLocationCoordinate2D?) async throws -> [Business]{
+        var url = URL(string: "")
+        if let location = location{
+            let locationModified = location.replacingOccurrences(of: " ", with: "%20").capitalized
+            url = URL(string:"https://api.yelp.com/v3/businesses/search?location=\(locationModified)&categories=restaurants&limit=10")
+        }
+        
+        if let userLocation = userLocation{
+            url = URL(string: "https://api.yelp.com/v3/businesses/search?latitude=\(userLocation.latitude)&longitude=\(userLocation.longitude)&categories=restaurants&limit=10")
+        }
         
         guard let api_key = Bundle.main.infoDictionary?["API_KEY"] else {
             print("Error: \(DataManagerErrors.noAPIKey.message)")
@@ -35,9 +46,7 @@ class DataManager{
         }
         print(api_key)
         
-        let locationModified = location.replacingOccurrences(of: " ", with: "%20").capitalized
-        
-        guard let url = URL(string: "https://api.yelp.com/v3/businesses/search?location=\(locationModified)&categories=restaurants&limit=10") else {
+        guard let url = url else {
             print("Error: \(DataManagerErrors.badURL.message)")
             throw DataManagerErrors.badURL
         }
@@ -72,5 +81,4 @@ class DataManager{
             throw error
         }
     }
-    
 }
