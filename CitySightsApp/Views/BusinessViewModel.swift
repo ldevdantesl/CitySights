@@ -9,15 +9,22 @@ import Foundation
 import SwiftUI
 import CoreLocation
 
+enum Categories{
+    case restaurants
+    case arts
+    case beautysvc
+    case fitness
+}
+
 @Observable
 class BusinessViewModel: NSObject, CLLocationManagerDelegate{
-    var location: String = ""
     var businessQuery: [Business] = []
     var selectedBusiness: Business = Business(id: "", alias: "", name: "", categories: [], rating: 0.2, coordinates: .init(latitude: 0, longitude: 0), transactions: [], location: .init(address1: "", city: "", country: "", state: ""))
     
     var dataManager = DataManager.shared
     var locationManager = CLLocationManager() // Location Manager.
     var userCurrentLocation: CLLocationCoordinate2D?
+    var categoriesSelected: [Categories] = [.restaurants]
     
     override init() {
         super.init()
@@ -25,9 +32,9 @@ class BusinessViewModel: NSObject, CLLocationManagerDelegate{
         locationManager.delegate = self
     }
     
-    func getResultsForSearchLocation() async throws{
+    func getResultsForSearchLocation(location: String,searchText: String, attributes: [String], categories: [String]) async throws{
         do {
-            businessQuery = try await dataManager.businessSearch(with: location, userLocation: nil)
+            businessQuery = try await dataManager.businessSearch(location: location, userLocation: nil, attributes: attributes, searchText: searchText, category: categories)
         } catch  {
             print(error.localizedDescription)
             throw error
@@ -36,10 +43,9 @@ class BusinessViewModel: NSObject, CLLocationManagerDelegate{
         await UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
     
-    func getResultsForUserLocation() async throws{
+    func getResultsForUserLocation(searchText: String, attributes: [String], categories: [String]) async throws{
         do {
-            print(userCurrentLocation as Any)
-            businessQuery = try await dataManager.businessSearch(with: nil, userLocation: userCurrentLocation)
+            businessQuery = try await dataManager.businessSearch(location: nil, userLocation: userCurrentLocation, attributes: attributes, searchText: searchText, category: categories)
         } catch  {
             print(error.localizedDescription)
             throw error

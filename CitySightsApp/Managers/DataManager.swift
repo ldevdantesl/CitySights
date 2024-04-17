@@ -13,6 +13,7 @@ enum DataManagerErrors:Error, CaseIterable{
     case badURL
     case noAPIKey
     case badURLResponse
+    case querySetError
     
     var message: String {
         switch self {
@@ -22,31 +23,69 @@ enum DataManagerErrors:Error, CaseIterable{
             return "Cant find API_KEY in the bundle."
         case .badURLResponse:
             return "Cant get URL Response from the server."
+        case .querySetError:
+            return "Can't create query set "
         }
     }
 }
 
 class DataManager{
     static let shared = DataManager()
+    @Environment(BusinessViewModel.self) var businessVM
     
-    func businessSearch(with location: String?, userLocation: CLLocationCoordinate2D?) async throws -> [Business]{
-        var url = URL(string: "")
+    func businessSearch(location: String?, userLocation: CLLocationCoordinate2D?, attributes: [String]?, searchText: String?, category: [String]?) async throws -> [Business]{
+        
+        var endpointURLString = ""
         if let location = location{
             let locationModified = location.replacingOccurrences(of: " ", with: "%20").capitalized
-            url = URL(string:"https://api.yelp.com/v3/businesses/search?location=\(locationModified)&categories=restaurants&limit=10")
+            endpointURLString = "https://api.yelp.com/v3/businesses/search?location=\(locationModified)"
+        } else {
+            endpointURLString = "https://api.yelp.com/v3/businesses/search?location=USA"
         }
         
         if let userLocation = userLocation{
-            url = URL(string: "https://api.yelp.com/v3/businesses/search?latitude=\(userLocation.latitude)&longitude=\(userLocation.longitude)&categories=restaurants&limit=10")
+            endpointURLString =  "https://api.yelp.com/v3/businesses/search?latitude=\(userLocation.latitude)&longitude=\(userLocation.longitude)"
         }
+        
+        if let searchText = searchText {
+            guard let termModified = searchText.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+                print("Error: \(DataManagerErrors.querySetError)")
+                throw DataManagerErrors.querySetError
+            }
+            endpointURLString.append("&term=\(termModified)")
+        }
+        
+        if let category = category{
+            endpointURLString.append("&category=")
+            category.forEach { cat in
+                if cat == category.last{
+                    endpointURLString.append(cat)
+                } else {
+                    endpointURLString.append("\(cat),")
+                }
+            }
+        }
+        
+        if let attributes = attributes{
+            endpointURLString.append("&attributes=")
+            attributes.forEach { attr in
+                if attr == attributes.last{
+                    endpointURLString.append(attr)
+                } else {
+                    endpointURLString.append("\(attr),")
+                }
+            }
+        }
+        
+        endpointURLString.append("&limit=10")
+        print(endpointURLString)
         
         guard let api_key = Bundle.main.infoDictionary?["API_KEY"] else {
             print("Error: \(DataManagerErrors.noAPIKey.message)")
             throw DataManagerErrors.noAPIKey
         }
-        print(api_key)
         
-        guard let url = url else {
+        guard let endpointURL = URL(string: endpointURLString) else {
             print("Error: \(DataManagerErrors.badURL.message)")
             throw DataManagerErrors.badURL
         }
@@ -56,7 +95,7 @@ class DataManager{
             "Authorization" : "Bearer \(api_key)"
         ]
 
-        var urlRequest = URLRequest(url: url)
+        var urlRequest = URLRequest(url: endpointURL)
         urlRequest.httpMethod = "GET"
         urlRequest.allHTTPHeaderFields = headers
         

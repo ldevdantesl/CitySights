@@ -12,6 +12,11 @@ struct ContentView: View {
     @State var showAlert: Bool = false
     @State var showBusinessView: Bool = false
     @State var showUserLocationButton: Bool = true
+    @State var searchText: String = ""
+    @State var attributes: [String] = []
+    @State var categories: [String] = []
+    @State var showFilterView: Bool = false
+    @State var location: String = ""
     
     var body: some View {
         @Bindable var businessVM = businessVM
@@ -25,18 +30,18 @@ struct ContentView: View {
                 .ifModif(showBusinessView, equal: false)
             
             HStack {
-                TextField("Which city are you looking for? ", text: $businessVM.location)
+                TextField("What are you looking for? ", text: $searchText)
                     .padding()
                     .autocorrectionDisabled()
-                    .frame(width: showUserLocationButton ? screen.width - 120 : screen.width - 70, height: 50)
+                    .frame(width:screen.width - 120, height: 50)
                     .background(.secondary.opacity(0.2), in:.rect(cornerRadius: 15))
                     .onSubmit(of:.text){
                         search()
                     }
-                    .onChange(of: businessVM.location) {
+                    .onChange(of: searchText) {
                         withAnimation {
                             self.showBusinessView = false
-                            if businessVM.location.isEmpty{
+                            if searchText.isEmpty{
                                 self.showUserLocationButton = true
                             } else {
                                 self.showUserLocationButton = false
@@ -51,33 +56,63 @@ struct ContentView: View {
                     .onTapGesture {
                         search()
                     }
-                if showUserLocationButton{
-                    Image(systemName: "mappin.circle.fill")
-                        .resizable().scaledToFit()
-                        .frame(width: 40, height: 40)
-                        .foregroundStyle(.blue.opacity(0.8))
-                        .onTapGesture {
-                            search(with: true)
-                        }
-                }
+                
+                Image(systemName: "arrow.up.and.down.text.horizontal")
+                    .resizable().scaledToFit()
+                    .frame(width: 30, height: 30)
+                    .foregroundStyle(.blue.opacity(0.8))
+                    .onTapGesture {
+                        showFilterView.toggle()
+                    }
             }
             .padding(.horizontal,20)
             .padding()
-            
+            HStack{
+                TextField("Where are you looking for ?", text: $location)
+                    .padding()
+                    .autocorrectionDisabled()
+                    .frame(width: screen.width - 70, height: 50)
+                    .background(.secondary.opacity(0.2), in:.rect(cornerRadius: 15))
+                    .onSubmit(of:.text){
+                        search()
+                    }
+                    .onChange(of: searchText) {
+                        withAnimation {
+                            self.showBusinessView = false
+                            if searchText.isEmpty{
+                                self.showUserLocationButton = true
+                            } else {
+                                self.showUserLocationButton = false
+                            }
+                        }
+                    }
+                Image(systemName: "mappin.circle.fill")
+                    .resizable().scaledToFit()
+                    .frame(width: 40, height: 40)
+                    .foregroundStyle(.blue.opacity(0.8))
+                    .onTapGesture {
+                        showFilterView.toggle()
+                    }
+            }
+            .ifModif(showUserLocationButton, equal: false)
             BusinessListView()
                 .ifModif(showBusinessView)
         }
-        .alert("Cant find anything for: \(businessVM.location)", isPresented: $showAlert) {
+        .sheet(isPresented: $showFilterView){
+            SearchFilterView(attributes: $attributes)
+                .presentationDetents([.medium, .medium])
+        }
+        .alert("Cant find anything for: \(searchText)", isPresented: $showAlert) {
             Button(role:.cancel) {} label: {Text("OK")}
         }
     }
-    func search(with userLocation: Bool = false){
+    func search(){
         Task{
             do{
-                if !userLocation{
-                    try await businessVM.getResultsForSearchLocation()
+                if !location.isEmpty{
+                    try await businessVM.getResultsForSearchLocation(location: location, searchText: searchText, attributes: attributes, categories: categories)
                 } else {
-                    try await businessVM.getResultsForUserLocation()
+                    try await businessVM.getResultsForUserLocation(searchText: searchText, attributes: attributes, categories: categories)
                 }
                 await MainActor.run {
                     withAnimation {

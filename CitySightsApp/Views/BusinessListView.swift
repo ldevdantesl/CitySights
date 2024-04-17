@@ -34,7 +34,7 @@ struct BusinessListView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 20, height: 20)
-                    Text(businessVM.location)
+                    Text("Location")
                         .font(.system(.title2, design: .rounded, weight: .semibold))
                 }
                 Picker("", selection: $selection) {

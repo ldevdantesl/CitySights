@@ -21,6 +21,7 @@
 		DA705C682BC9435000E59481 /* BusinessViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA705C672BC9435000E59481 /* BusinessViewModel.swift */; };
 		DADEAD492BC993F7004A84A1 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADEAD482BC993F7004A84A1 /* MapView.swift */; };
 		DADEAD4B2BCB4FC7004A84A1 /* OnBoardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADEAD4A2BCB4FC7004A84A1 /* OnBoardingView.swift */; };
+		DADEAD4D2BCE0FDB004A84A1 /* SearchFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADEAD4C2BCE0FDB004A84A1 /* SearchFilterView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 		DA705C672BC9435000E59481 /* BusinessViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BusinessViewModel.swift; sourceTree = "<group>"; };
 		DADEAD482BC993F7004A84A1 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		DADEAD4A2BCB4FC7004A84A1 /* OnBoardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnBoardingView.swift; sourceTree = "<group>"; };
+		DADEAD4C2BCE0FDB004A84A1 /* SearchFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchFilterView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +84,7 @@
 				DA705C5F2BC8D13200E59481 /* BusinessListView.swift */,
 				DA705C612BC8DB9F00E59481 /* BusinessRowView.swift */,
 				DADEAD4A2BCB4FC7004A84A1 /* OnBoardingView.swift */,
+				DADEAD4C2BCE0FDB004A84A1 /* SearchFilterView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -208,6 +211,7 @@
 				DA705C682BC9435000E59481 /* BusinessViewModel.swift in Sources */,
 				DA705C642BC8F46100E59481 /* BusinessDetailView.swift in Sources */,
 				DA705C482BC4479E00E59481 /* CitySightsAppApp.swift in Sources */,
+				DADEAD4D2BCE0FDB004A84A1 /* SearchFilterView.swift in Sources */,
 				DA705C662BC903B900E59481 /* Helpers.swift in Sources */,
 				DADEAD4B2BCB4FC7004A84A1 /* OnBoardingView.swift in Sources */,
 				DA705C602BC8D13200E59481 /* BusinessListView.swift in Sources */,
