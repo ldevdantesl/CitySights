@@ -76,14 +76,9 @@ struct ContentView: View {
                     .onSubmit(of:.text){
                         search()
                     }
-                    .onChange(of: searchText) {
+                    .onChange(of: location) {
                         withAnimation {
                             self.showBusinessView = false
-                            if searchText.isEmpty{
-                                self.showUserLocationButton = true
-                            } else {
-                                self.showUserLocationButton = false
-                            }
                         }
                     }
                 Image(systemName: "mappin.circle.fill")
