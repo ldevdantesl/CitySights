@@ -24,6 +24,7 @@ enum BusinessViewSelection: Hashable, CaseIterable{
 
 struct BusinessListView: View {
     @Environment(BusinessViewModel.self) var businessVM
+    @Binding var location: String
     @State var selection: BusinessViewSelection = .listView
     @State var showBusinessView: Bool = false
     var body: some View {
@@ -34,7 +35,7 @@ struct BusinessListView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 20, height: 20)
-                    Text("Location")
+                    Text(location)
                         .font(.system(.title2, design: .rounded, weight: .semibold))
                 }
                 Picker("", selection: $selection) {
@@ -45,7 +46,7 @@ struct BusinessListView: View {
                 .pickerStyle(SegmentedPickerStyle())
                 if selection == .listView{
                     ScrollView{
-                        Text("Restaurants")
+                        Text("Sights")
                             .font(.system(.title, design: .rounded, weight: .semibold))
                             .hSpacing()
                         
@@ -66,5 +67,6 @@ struct BusinessListView: View {
 }
 
 #Preview {
-    BusinessListView()
+    BusinessListView(location: .constant("Location"))
+        .environment(BusinessViewModel())
 }

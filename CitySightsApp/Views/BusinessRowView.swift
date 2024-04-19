@@ -17,13 +17,19 @@ struct BusinessRowView: View {
                 AsyncImage(url: URL(string:business.imageURL ?? "")) { img in
                     img.resizable()
                         .clipShape(.rect(cornerRadius: 15))
-                        .frame(width: UIScreen.main.bounds.width / 3 - 10, height: UIScreen.main.bounds.height / 10)
+                        .frame(width: screen.width / 3, height: screen.height / 10)
                         .aspectRatio(contentMode: .fill)
                         
                 } placeholder: {
                     ProgressView()
-                        .frame(width: UIScreen.main.bounds.width / 3, height: UIScreen.main.bounds.height / 10)
+                        .frame(width: screen.width / 3, height: screen.height / 10)
                 }
+                .ifModif(checkURL())
+                
+                Image(systemName: "photo")
+                    .resizable()
+                    .frame(width: screen.width / 3, height: screen.height / 10)
+                    .ifModif(checkURL(), equal: false)
                     
                 VStack(alignment:.leading){
                     HStack{
@@ -49,6 +55,15 @@ struct BusinessRowView: View {
             BusinessDetailView(goBack: $showDetailView)
         }
     }
+    
+    func checkURL() -> Bool {
+        if let url = business.imageURL{
+            return true
+        } else {
+            return false
+        }
+    }
+    
     func distanceCalc(distance: Double?) -> Int{
         if let distance = distance{
             return Int(distance/600)

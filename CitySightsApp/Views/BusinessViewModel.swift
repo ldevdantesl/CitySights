@@ -40,13 +40,14 @@ class BusinessViewModel: NSObject, CLLocationManagerDelegate{
         locationManager.requestLocation()
     }
     
-    func getResults(searchText: String, attributes: [String], categories: [String], location: String) async throws {
+    func getResults(searchText: String, attributes: [String], categories: [String], location: String, limit: Int = 10) async throws {
         do {
             let businessQuery = try await dataManager.businessSearch(
                 location: location,
                 attributes: attributes,
                 searchText: searchText,
-                category: categories
+                category: categories,
+                limit: limit
             )
             await MainActor.run{
                 self.businessQuery = businessQuery

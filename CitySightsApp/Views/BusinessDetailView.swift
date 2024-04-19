@@ -24,7 +24,12 @@ struct BusinessDetailView: View {
                             .ignoresSafeArea()
                     } else {
                         // Handle loading or error state
-                        Text("Loading image...")
+                        Image(systemName: "photo")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: geo.size.width - 20, height: geo.size.height) // Adjust knownOffset accordingly
+                            .clipped()
+                            .padding(.horizontal,10)
                     }
                 }
             }
@@ -82,7 +87,7 @@ struct BusinessDetailView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 20, height: 20)
-                        Text(businessVM.selectedBusiness.displayPhone ?? "")
+                        Text(businessVM.selectedBusiness.displayPhone ?? "No phone number")
                             .font(.system(.headline, design: .rounded, weight: .semibold))
                         Spacer()
                         Image(systemName: "arrow.right")
@@ -108,7 +113,7 @@ struct BusinessDetailView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 20, height: 20)
-                        Text(businessVM.selectedBusiness.url ?? "")
+                        Text(businessVM.selectedBusiness.url ?? "No website")
                             .font(.system(.headline, design: .rounded, weight: .semibold))
                             .lineLimit(1)
                         Spacer()
@@ -144,8 +149,10 @@ struct BusinessDetailView: View {
                     return str.replacingOccurrences(of: " ", with: "+")
                 }
                 print(bsnAdress)
-                if let url = URL(string: "http://maps.apple.com/?address=\(bsnAdress)"){
-                    UIApplication.shared.open(url)
+                guard let url = URL(string: "http://maps.apple.com/?address=\(bsnAdress)"),
+                      UIApplication.shared.canOpenURL(url) else {
+                    print("Cant open URL")
+                    return
                 }
             } label:{
                 HStack{

@@ -33,7 +33,7 @@ class DataManager{
     static let shared = DataManager()
     @Environment(BusinessViewModel.self) var businessVM
     
-    func businessSearch(location: String, attributes: [String]?, searchText: String?, category: [String]?) async throws -> [Business]{
+    func businessSearch(location: String, attributes: [String]? = nil, searchText: String?, category: [String]? = nil, limit: Int? = 10) async throws -> [Business]{
         
         let locationModified = location.replacingOccurrences(of: " ", with: "%20").capitalized
         var endpointURLString = "https://api.yelp.com/v3/businesses/search?location=\(locationModified)"
@@ -67,9 +67,9 @@ class DataManager{
                 }
             }
         }
-        
-        endpointURLString.append("&limit=10")
-        print(endpointURLString)
+        if let limit = limit{
+            endpointURLString.append("&limit=\(limit)")
+        }
         
         guard let api_key = Bundle.main.infoDictionary?["API_KEY"] else {
             print("Error: \(DataManagerErrors.noAPIKey.message)")
