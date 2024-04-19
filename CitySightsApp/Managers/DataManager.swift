@@ -33,19 +33,10 @@ class DataManager{
     static let shared = DataManager()
     @Environment(BusinessViewModel.self) var businessVM
     
-    func businessSearch(location: String?, userLocation: CLLocationCoordinate2D?, attributes: [String]?, searchText: String?, category: [String]?) async throws -> [Business]{
+    func businessSearch(location: String, attributes: [String]?, searchText: String?, category: [String]?) async throws -> [Business]{
         
-        var endpointURLString = ""
-        if let location = location{
-            let locationModified = location.replacingOccurrences(of: " ", with: "%20").capitalized
-            endpointURLString = "https://api.yelp.com/v3/businesses/search?location=\(locationModified)"
-        } else {
-            endpointURLString = "https://api.yelp.com/v3/businesses/search?location=USA"
-        }
-        
-        if let userLocation = userLocation{
-            endpointURLString =  "https://api.yelp.com/v3/businesses/search?latitude=\(userLocation.latitude)&longitude=\(userLocation.longitude)"
-        }
+        let locationModified = location.replacingOccurrences(of: " ", with: "%20").capitalized
+        var endpointURLString = "https://api.yelp.com/v3/businesses/search?location=\(locationModified)"
         
         if let searchText = searchText {
             guard let termModified = searchText.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {

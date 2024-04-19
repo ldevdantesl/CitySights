@@ -10,6 +10,7 @@ import SwiftUI
 @main
 struct CitySightsAppApp: App {
     @AppStorage("onboarding") var onboarding = true
+    @State var businessVM = BusinessViewModel()
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -17,6 +18,11 @@ struct CitySightsAppApp: App {
                 .fullScreenCover(isPresented: $onboarding){
                     OnBoardingView()
                         .environment(BusinessViewModel())
+                }
+                .onAppear{
+                    if businessVM.locationAuthStatus == .notDetermined{
+                        businessVM.getUserLocation()
+                    }
                 }
         }
     }

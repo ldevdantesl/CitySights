@@ -65,7 +65,7 @@ struct Location: Codable, Hashable{
     var zipCode: String?
     var country: String
     var state: String
-    var displayAddress: [String]?
+    var displayAddress: [String]
     
     enum CodingKeys: String, CodingKey{
         case address1,address2, address3, city, zipCode, country, state

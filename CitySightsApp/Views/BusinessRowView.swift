@@ -78,4 +78,5 @@ struct BusinessRowView: View {
 
 #Preview {
     BusinessRowView(business: BusinessViewModel().selectedBusiness)
+        .environment(BusinessViewModel())
 }

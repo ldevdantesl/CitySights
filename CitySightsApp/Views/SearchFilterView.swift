@@ -9,9 +9,8 @@ import SwiftUI
 
 struct SearchFilterView: View {
     @Environment(BusinessViewModel.self) var businessVM
-    @Binding var attributes: [String]
-    @State private var popular: Bool = false
-    @State private var deals: Bool = false
+    @Binding var popular: Bool
+    @Binding var deals: Bool
     var body: some View {
         VStack{
             Text("Filter")
@@ -23,32 +22,10 @@ struct SearchFilterView: View {
                     .font(.system(.title3, design: .rounded, weight: .semibold))
                     .foregroundStyle(.tint)
             }
-            .onChange(of: popular){ oldValue, newValue in
-                if newValue == true{
-                    attributes.append("hot_and_new")
-                    print(attributes)
-                } else {
-                    attributes.removeAll { str in
-                        str == "hot_and_new"
-                    }
-                    print(attributes)
-                }
-            }
             Toggle(isOn: $deals){
                 Text("Deals")
                     .font(.system(.title3, design: .rounded, weight: .semibold))
                     .foregroundStyle(.tint)
-            }
-            .onChange(of: deals){ oldValue, newValue in
-                if newValue == true{
-                    attributes.append("deals")
-                    print(attributes)
-                } else {
-                    attributes.removeAll { str in
-                        str == "deals"
-                    }
-                    print(attributes)
-                }
             }
             Spacer()
         }
@@ -57,6 +34,6 @@ struct SearchFilterView: View {
 }
 
 #Preview {
-    SearchFilterView(attributes: .constant([]))
+    SearchFilterView(popular: .constant(false), deals: .constant(false))
         .environment(BusinessViewModel())
 }

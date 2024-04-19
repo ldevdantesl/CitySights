@@ -60,7 +60,7 @@ struct BusinessDetailView: View {
                     .font(.system(.title, design: .rounded, weight: .semibold))
                     .hSpacing()
                 
-                ForEach(businessVM.selectedBusiness.location.displayAddress ?? [], id:\.self){ loc in
+                ForEach(businessVM.selectedBusiness.location.displayAddress, id:\.self){ loc in
                     Text(loc)
                         .font(.system(.callout, design: .rounded, weight: .light))
                         .foregroundStyle(.secondary)
@@ -69,10 +69,14 @@ struct BusinessDetailView: View {
                 showRating(rating: businessVM.selectedBusiness.rating)
                     .hSpacing()
                     .padding(.bottom,10)
-                
                 Button{
-                    
-                } label:{
+                    guard let url = URL(string: "tel://\(businessVM.selectedBusiness.phone ?? "")"),
+                          UIApplication.shared.canOpenURL(url) else {
+                            print("Cant call this Phone Number")
+                              return
+                          }
+                    UIApplication.shared.open(url)
+                }label:{
                     HStack{
                         Image(systemName: "phone")
                             .resizable()
@@ -88,10 +92,16 @@ struct BusinessDetailView: View {
                     }
                     .padding(.vertical,10)
                 }
-                .foregroundStyle(.black)
+                .foregroundStyle(.primary)
                 Divider()
+            
                 Button{
-                    
+                    guard let url = URL(string: "\(businessVM.selectedBusiness.url ?? "")"),
+                          UIApplication.shared.canOpenURL(url) else {
+                            print("Cant open this URL")
+                              return
+                          }
+                    UIApplication.shared.open(url)
                 } label:{
                     HStack{
                         Image(systemName: "globe")
@@ -109,33 +119,34 @@ struct BusinessDetailView: View {
                     }
                     .padding(.vertical,10)
                 }
-                .foregroundStyle(.black)
+                .foregroundStyle(.primary)
                 Divider()
-                Button{
-                    
-                } label:{
-                    HStack{
-                        Image(systemName: "quote.bubble")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
-                        Text("\(businessVM.selectedBusiness.reviewCount ?? 0) reviews" )
-                            .font(.system(.headline, design: .rounded, weight: .semibold))
-                            .lineLimit(1)
-                        Spacer()
-                        Image(systemName: "arrow.right")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
-                    }
-                    .padding(.vertical,10)
+                
+                
+                HStack{
+                    Image(systemName: "quote.bubble")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+                    Text("\(businessVM.selectedBusiness.reviewCount ?? 0) reviews" )
+                        .font(.system(.headline, design: .rounded, weight: .semibold))
+                        .lineLimit(1)
+                    Spacer()
                 }
-                .foregroundStyle(.black)
+                .padding(.vertical,10)
+                .foregroundStyle(.primary)
                 Divider()
             }
             .padding(.horizontal, 20)
+            
             Button{
-                
+                let bsnAdress = businessVM.selectedBusiness.location.displayAddress.map { str in
+                    return str.replacingOccurrences(of: " ", with: "+")
+                }
+                print(bsnAdress)
+                if let url = URL(string: "http://maps.apple.com/?address=\(bsnAdress)"){
+                    UIApplication.shared.open(url)
+                }
             } label:{
                 HStack{
                     Image(systemName: "paperplane")

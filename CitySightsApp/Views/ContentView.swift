@@ -13,10 +13,12 @@ struct ContentView: View {
     @State var showBusinessView: Bool = false
     @State var showUserLocationButton: Bool = true
     @State var searchText: String = ""
-    @State var attributes: [String] = []
     @State var categories: [String] = []
     @State var showFilterView: Bool = false
     @State var location: String = ""
+    
+    @State var popular = false
+    @State var deals = false
     
     var body: some View {
         @Bindable var businessVM = businessVM
@@ -86,7 +88,9 @@ struct ContentView: View {
                     .frame(width: 40, height: 40)
                     .foregroundStyle(.blue.opacity(0.8))
                     .onTapGesture {
-                        showFilterView.toggle()
+                        Task{
+                            await locateUser()
+                        }
                     }
             }
             .ifModif(showUserLocationButton, equal: false)
@@ -94,21 +98,30 @@ struct ContentView: View {
                 .ifModif(showBusinessView)
         }
         .sheet(isPresented: $showFilterView){
-            SearchFilterView(attributes: $attributes)
-                .presentationDetents([.medium, .medium])
+            SearchFilterView(popular: $popular, deals: $deals)
+                .presentationDetents([.height(200)])
+                .presentationDragIndicator(.visible)
+                .presentationBackgroundInteraction(.enabled(upThrough: .height(200)))
+                .presentationContentInteraction(.scrolls)
         }
         .alert("Cant find anything for: \(searchText)", isPresented: $showAlert) {
             Button(role:.cancel) {} label: {Text("OK")}
         }
     }
+    func locateUser() async {
+        guard let loc = businessVM.userLocationArea else {
+            print("Cat locate the user.")
+            return
+        }
+        self.location = loc
+    }
     func search(){
         Task{
             do{
-                if !location.isEmpty{
-                    try await businessVM.getResultsForSearchLocation(location: location, searchText: searchText, attributes: attributes, categories: categories)
-                } else {
-                    try await businessVM.getResultsForUserLocation(searchText: searchText, attributes: attributes, categories: categories)
+                if location.isEmpty{
+                    await locateUser()
                 }
+                try await businessVM.getResults(searchText: searchText, attributes: [], categories: categories, location: location)
                 await MainActor.run {
                     withAnimation {
                         self.showBusinessView.toggle()
